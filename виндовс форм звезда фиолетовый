@@ -1,0 +1,100 @@
+using System.Drawing.Drawing2D;
+
+namespace WinFormsApp5
+{
+    public partial class Form1 : Form
+    {
+
+        private bool dragging = false; // Флаг, указывающий, перетаскивается ли форма
+        private Point dragCursorPoint; // Точка курсора
+        private Point dragFormPoint; // Точка формы
+
+        public Form1()
+        {
+            InitializeComponent();
+            this.ClientSize = new Size(400, 400); // Установка размеров формы
+            this.Text = "Фиолетовый круг"; // Установка заголовка формы
+                                           // Установка формы круглой
+            SetFormToStar();
+            // Подписка на событие Paint
+            this.Paint += new PaintEventHandler(MainForm_Paint);
+            // Подписка на события мыши для перетаскивания формы
+            this.MouseDown += new MouseEventHandler(Form1_MouseDown);
+            this.MouseMove += new MouseEventHandler(Form1_MouseMove);
+            this.MouseUp += new MouseEventHandler(Form1_MouseUp);
+
+        }
+
+        private void SetFormToStar()
+        {
+            // Создаем звезда область (Region) для формы
+            GraphicsPath path = new GraphicsPath();
+            PointF[] starPoints = {
+            new PointF(200, 40),
+            new PointF(240, 150),
+            new PointF(360, 150),
+            new PointF(260, 230),
+            new PointF(300, 340),
+            new PointF(200, 270),
+            new PointF(100, 340),
+            new PointF(140, 230),
+            new PointF(40, 150),
+            new PointF(160, 150)
+            };
+            path.AddPolygon(starPoints);
+            this.Region = new Region(path);
+        }
+
+        private void MainForm_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            Brush brush = Brushes.Violet; // Фиолетовая кисть
+                                          // Рисуем звезду
+            PointF[] starPoints = {
+            new PointF(200, 40),
+            new PointF(240, 150),
+            new PointF(360, 150),
+            new PointF(260, 230),
+            new PointF(300, 340),
+            new PointF(200, 270),
+            new PointF(100, 340),
+            new PointF(140, 230),
+            new PointF(40, 150),
+            new PointF(160, 150)
+             };
+            g.FillPolygon(brush, starPoints); // Заполняем звезду
+        }
+
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left) // Проверяем, нажата ли левая кнопка мыши
+            {
+                dragging = true; // Устанавливаем флаг перетаскивания
+                dragCursorPoint = Cursor.Position; // Получаем текущую позицию курсора
+                dragFormPoint = this.Location; // Получаем текущую позицию формы
+            }
+        }
+        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (dragging) // Если форма перетаскивается
+            {
+                // Вычисляем смещение курсора относительно формы
+                Point dif = Point.Subtract(Cursor.Position, new Size(dragCursorPoint));
+
+                // Устанавливаем новое положение формы
+                this.Location = Point.Add(dragFormPoint, new Size(dif));
+            }
+
+        }
+        private void Form1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left) // Проверяем, отпущена ли левая кнопка мыши
+            {
+                dragging = false; // Сбрасываем флаг перетаскивания
+            }
+        }
+
+
+    }
+}
+
